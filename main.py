@@ -37,20 +37,20 @@ for eip_dict in addresses_dict['Addresses']:
     eip_all.append(eip_dict['AllocationId'])
 
 
-print "Crawling AWS for Running Instancea"
-ec2 = boto3.resource('ec2')
-instances = ec2.instances.filter(
-        Filters=[{'Name' : 'instance-state-name','Values' : ['running']}])
-for instance in ec2.instances.all():
-   instance_all.append(instance.id)
+# print "Crawling AWS for Running Instancea"
+# ec2 = boto3.resource('ec2')
+# instances = ec2.instances.filter(
+#         Filters=[{'Name' : 'instance-state-name','Values' : ['running']}])
+# for instance in ec2.instances.all():
+#    instance_all.append(instance.id)
 
 
 
-ec2 = boto3.resource('ec2')
-instances = ec2.instances.filter(
-        Filters=[{'Name': 'tag:spotinst:accountId', 'Values': ['act-92c64cb7']},{'Name' : 'instance-state-name','Values' : ['running']}])
-for instance in instances:
-    instance_spot.append(instance.id)
+# ec2 = boto3.resource('ec2')
+# instances = ec2.instances.filter(
+#         Filters=[{'Name': 'tag:spotinst:accountId', 'Values': ['act-92c64cb7']},{'Name' : 'instance-state-name','Values' : ['running']}])
+# for instance in instances:
+#     instance_spot.append(instance.id)
 
 
 
@@ -185,18 +185,5 @@ Terraform_file = raw_input("\n\n\nDo you want to generate terraform file for non
 
 print('\n\n')
 if Terraform_file=='Y':
-	client = boto3.client('ec2')
-	addresses_dict = client.describe_addresses()
-	t = Template('\nresource "aws_eip" "$ip" {\n\tvpc= true\n}') 
-	s = Template('\nresource "aws_eip" "$ip" {\n\tinstance="$ids"\n\tvpc= true\n}') 
-	for eip_dict in addresses_dict['Addresses']:
-	    if eip_dict['AllocationId'] in eip_non_terraform:
-	    	ip=eip_dict['AllocationId']
-	    	try:
-	    		ids=eip_dict['InstanceId']
-	    	except:
-	    		ids='NONE'
-	    	if ids=='NONE':
-	    		print (t.substitute(ip = ip))
-	    	else:
-	    		print (s.substitute(ip = ip, ids=ids))
+	import module_eip
+	
