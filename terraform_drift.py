@@ -1,6 +1,7 @@
 import json
 import boto3
 import sys
+from string import Template
 
 terraform_instance=[]
 instance_spot=[]
@@ -109,7 +110,7 @@ for x in range(len_module):
 				terraform_elb.append(obj_spot['modules'][x]['resources'][k]['primary']['id'])
 			else:
 				terraform_eip.append(obj_spot['modules'][x]['resources'][k]['primary']['id'])
-				print "Spot: "+ str(obj_spot['modules'][x]['resources'][k]['primary']['id'])
+
 
 if (len(spotinst_group_id) > 0):
 	ec2 = boto3.resource('ec2')
@@ -179,4 +180,23 @@ print eip_non_terraform
 
 
 
-Terraform_file = raw_input("Do you want to generate terraform file for non existing EIP [Y/N] :")
+Terraform_file = raw_input("\n\n\nDo you want to generate terraform file for non existing EIP [Y/N] :").upper()
+
+
+print('\n\n')
+if Terraform_file=='Y':
+	client = boto3.client('ec2')
+	addresses_dict = client.describe_addresses()
+	t = Template('\nresource "aws_eip" "$ip" {\n\tvpc= true\n}') 
+	s = Template('\nresource "aws_eip" "$ip" {\n\tinstance="$ids"\n\tvpc= true\n}') 
+	for eip_dict in addresses_dict['Addresses']:
+	    if eip_dict['AllocationId'] in eip_non_terraform:
+	    	ip=eip_dict['AllocationId']
+	    	try:
+	    		ids=eip_dict['InstanceId']
+	    	except:
+	    		ids='NONE'
+	    	if ids=='NONE':
+	    		print (t.substitute(ip = ip))
+	    	else:
+	    		print (s.substitute(ip = ip, ids=ids))
