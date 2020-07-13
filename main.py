@@ -3,6 +3,10 @@ import boto3
 import sys
 from string import Template
 
+import os
+cwd = os.getcwd()
+print cwd
+
 terraform_instance=[]
 instance_spot=[]
 instance_all=[]
@@ -37,20 +41,20 @@ for eip_dict in addresses_dict['Addresses']:
     eip_all.append(eip_dict['AllocationId'])
 
 
-# print "Crawling AWS for Running Instancea"
-# ec2 = boto3.resource('ec2')
-# instances = ec2.instances.filter(
-#         Filters=[{'Name' : 'instance-state-name','Values' : ['running']}])
-# for instance in ec2.instances.all():
-#    instance_all.append(instance.id)
+print "Crawling AWS for Running Instancea"
+ec2 = boto3.resource('ec2')
+instances = ec2.instances.filter(
+        Filters=[{'Name' : 'instance-state-name','Values' : ['running']}])
+for instance in ec2.instances.all():
+   instance_all.append(instance.id)
 
 
 
-# ec2 = boto3.resource('ec2')
-# instances = ec2.instances.filter(
-#         Filters=[{'Name': 'tag:spotinst:accountId', 'Values': ['act-92c64cb7']},{'Name' : 'instance-state-name','Values' : ['running']}])
-# for instance in instances:
-#     instance_spot.append(instance.id)
+ec2 = boto3.resource('ec2')
+instances = ec2.instances.filter(
+        Filters=[{'Name': 'tag:spotinst:accountId', 'Values': ['act-92c64cb7']},{'Name' : 'instance-state-name','Values' : ['running']}])
+for instance in instances:
+    instance_spot.append(instance.id)
 
 
 
